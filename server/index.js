@@ -36,7 +36,7 @@ app.use(helmet());
 
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ['https://yourdomain.com']
+  ? ['https://pos-crm-lyart.vercel.app']
   : [
       'http://localhost:3000',
       'https://localhost:3000',
