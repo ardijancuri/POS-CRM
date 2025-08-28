@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Set up API base URL from environment variable
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+// Configure axios base URL
+axios.defaults.baseURL = API_BASE_URL;
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
