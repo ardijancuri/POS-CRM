@@ -11,7 +11,7 @@ const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const settingsRoutes = require('./routes/settings');
 const serviceRoutes = require('./routes/services');
-const { run } = require('./database/connection');
+const { run, testConnection } = require('./database/connection');
 const { setupDatabase } = require('./database/setup');
 
 const app = express();
@@ -37,7 +37,12 @@ app.use(helmet());
 
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ['https://pos-crm-lyart.vercel.app']
+  ? [
+      'https://pos-crm-lyart.vercel.app',
+      'https://pos-crm.vercel.app',
+      'https://pos-crm-git-main-pos-crm-lyart.vercel.app',
+      'https://pos-crm-git-main-pos-crm.vercel.app'
+    ]
   : [
       'http://localhost:3000',
       'https://localhost:3000',
@@ -75,8 +80,22 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/services', serviceRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+  try {
+    const dbStatus = await testConnection();
+    res.json({ 
+      status: 'OK', 
+      timestamp: new Date().toISOString(),
+      database: dbStatus ? 'connected' : 'disconnected'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      timestamp: new Date().toISOString(),
+      database: 'error',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Database connection error'
+    });
+  }
 });
 
 // Error handling middleware
@@ -98,6 +117,15 @@ app.listen(PORT, async () => {
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   
   try {
+    // Test database connection first
+    console.log('🔍 Testing database connection...');
+    const isConnected = await testConnection();
+    
+    if (!isConnected) {
+      console.error('❌ Cannot proceed without database connection');
+      return;
+    }
+    
     // Run database setup
     console.log('🗄️ Setting up database...');
     await setupDatabase();

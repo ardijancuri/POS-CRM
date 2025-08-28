@@ -919,13 +919,13 @@ router.put('/:id', authenticateToken, requireAdmin, [
 
       await client.query('COMMIT');
 
-      res.json({ 
+    res.json({ 
         message: 'Order updated successfully',
-        orderId,
+      orderId,
         status: status || 'unchanged',
         itemsUpdated: items ? true : false
-      });
-    } catch (error) {
+    });
+  } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {

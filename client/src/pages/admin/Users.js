@@ -381,14 +381,14 @@ const UsersList = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input"
             />
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="btn-primary w-full sm:w-auto"
-          >
-            <User className="h-4 w-4 mr-2" />
-            Add Client
-          </button>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="btn-primary w-full sm:w-auto"
+        >
+          <User className="h-4 w-4 mr-2" />
+          Add Client
+        </button>
         </div>
       </div>
 
@@ -398,7 +398,7 @@ const UsersList = () => {
        <div className="card w-full">
          <div className="card-header">
            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-             <h3 className="text-lg font-medium text-gray-900">All Users</h3>
+           <h3 className="text-lg font-medium text-gray-900">All Users</h3>
              <button
                onClick={generateUsersReport}
                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto"

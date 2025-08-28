@@ -55,7 +55,17 @@ router.post('/login', [
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Login failed' });
+    // More detailed error logging for debugging
+    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+      return res.status(500).json({ 
+        message: 'Database connection failed. Please check your database configuration.',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Database connection error'
+      });
+    }
+    res.status(500).json({ 
+      message: 'Login failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 });
 

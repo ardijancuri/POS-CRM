@@ -18,8 +18,27 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // Don't exit the process in production, just log the error
+  if (process.env.NODE_ENV === 'production') {
+    console.error('Database connection error (production mode):', err.message);
+  } else {
+    process.exit(-1);
+  }
 });
+
+// Add connection test function
+const testConnection = async () => {
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT NOW()');
+    client.release();
+    console.log('✅ Database connection test successful');
+    return true;
+  } catch (error) {
+    console.error('❌ Database connection test failed:', error.message);
+    return false;
+  }
+};
 
 // Helper function to run queries with promises
 const query = (sql, params = []) => {
@@ -47,4 +66,4 @@ const all = async (sql, params = []) => {
   return result.rows;
 };
 
-module.exports = { pool, query, run, get, all }; 
+module.exports = { pool, query, run, get, all, testConnection }; 
