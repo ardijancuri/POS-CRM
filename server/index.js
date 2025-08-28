@@ -13,6 +13,7 @@ const settingsRoutes = require('./routes/settings');
 const serviceRoutes = require('./routes/services');
 const { run, testConnection } = require('./database/connection');
 const { setupDatabase } = require('./database/setup');
+const { setupSupabaseDatabase } = require('./database/supabase-setup');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -116,6 +117,12 @@ app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   
+  // Debug: Log environment variables
+  console.log('🔍 Environment variables check:');
+  console.log('   DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('   DATABASE_URL length:', process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0);
+  console.log('   DATABASE_URL preview:', process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 50) + '...' : 'NOT SET');
+  
   try {
     // Test database connection first
     console.log('🔍 Testing database connection...');
@@ -126,10 +133,16 @@ app.listen(PORT, async () => {
       return;
     }
     
-    // Run database setup
+    // Run database setup (try Supabase first, fallback to original)
     console.log('🗄️ Setting up database...');
-    await setupDatabase();
-    console.log('✅ Database setup completed');
+    try {
+      await setupSupabaseDatabase();
+      console.log('✅ Supabase database setup completed');
+    } catch (error) {
+      console.log('⚠️  Supabase setup failed, trying original setup...');
+      await setupDatabase();
+      console.log('✅ Original database setup completed');
+    }
   } catch (error) {
     console.error('❌ Database setup failed:', error.message);
   }
