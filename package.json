@@ -4,6 +4,7 @@
   "description": "A combined POS and CRM system with admin and client roles",
   "main": "server/index.js",
   "scripts": {
+    "start": "cd server && node index.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
     "client": "cd client && cross-env HTTPS=true HOST=0.0.0.0 npm start",
