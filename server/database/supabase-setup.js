@@ -238,4 +238,12 @@ async function setupSupabaseDatabase() {
   }
 }
 
+// Only run setupSupabaseDatabase if this file is run directly
+if (require.main === module) {
+  setupSupabaseDatabase().finally(async () => {
+    await pool.end();
+    process.exit(0);
+  });
+}
+
 module.exports = { setupSupabaseDatabase };

@@ -496,10 +496,14 @@ async function setupDatabase() {
 
   } catch (error) {
     console.error('❌ Error setting up database:', error);
-    process.exit(1);
-  } finally {
-    await pool.end();
+    throw error; // Don't exit process, just throw error
   }
 }
 
-setupDatabase(); 
+// Only run setupDatabase if this file is run directly
+if (require.main === module) {
+  setupDatabase().finally(async () => {
+    await pool.end();
+    process.exit(0);
+  });
+} 
