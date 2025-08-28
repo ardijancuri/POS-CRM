@@ -12,6 +12,7 @@ const orderRoutes = require('./routes/orders');
 const settingsRoutes = require('./routes/settings');
 const serviceRoutes = require('./routes/services');
 const { run } = require('./database/connection');
+const { setupDatabase } = require('./database/setup');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -92,11 +93,16 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-  // Ensure barcode column exists (simple migration)
-  run(`ALTER TABLE products ADD COLUMN IF NOT EXISTS barcode VARCHAR(255) UNIQUE`).catch((e) => {
-    console.error('Failed ensuring barcode column', e.message);
-  });
+  
+  try {
+    // Run database setup
+    console.log('🗄️ Setting up database...');
+    await setupDatabase();
+    console.log('✅ Database setup completed');
+  } catch (error) {
+    console.error('❌ Database setup failed:', error.message);
+  }
 });
